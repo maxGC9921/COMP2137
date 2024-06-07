@@ -2,9 +2,9 @@
 userName=$USER
 dateTime="$(date)"
 hostnameReport="$(hostname)" 
-operatingSystem="$(uname -a)"
+operatingSystem="$(grep 'PRETTY_NAME' /etc/os-release | cut -d'"' -f2)"
 timeUp="$(uptime)"
-cpuInfo="$(lscpu | grep 'Model name: '| awk '{$1=$1;print}')"
+cpuInfo="$(lscpu | grep 'Model name: ' | awk '{$1=$1;print}')"
 cpuSpeed="$(grep 'cpu MHz' /proc/cpuinfo | awk '{$1=$1;print}'| uniq )"
 ramInfo="$(hwinfo --memory | grep 'Memory Size')"
 diskInfo="$(lshw -class disk | grep 'product' | awk '{$1=$1;print}'| uniq)"
