@@ -7,16 +7,21 @@ operatingSystem="$(grep 'PRETTY_NAME' /etc/os-release | cut -d'"' -f2)"
 timeUp="$(uptime -p)"
 #This line will print info on the CPU, the delimiter will remove the "Model name" from the output while awk while be used to bring closer the output to "cpu:"
 cpuInfo="$(lscpu | grep 'Model name: ' | cut -d " " -f3- | awk '{$1=$1;print}')"
+#This line will output the cpu speed and remove the 'cpu MHz' in front of the integers. The second part of the line will output the max CPU speed. awk is being used to remove unnecessary white space 
 cpuSpeed="$(grep 'cpu MHz' /proc/cpuinfo | cut -d ":" -f2 | uniq && sudo dmidecode -t processor | grep "Speed" | uniq | head -n 1 | awk '{$1=$1;print}')"
+#This line will only display the Memory size. Cut is used to remove 'Memory Size' from the output
 ramInfo="$(hwinfo --memory | grep 'Memory Size' | cut -d ":" -f2)"
+#This line will output the product, vendor, and size while also removing unnecessary white space. grep -v is being used to filter unnecessary information from the output
 diskInfo="$(sudo lshw -class disk | grep -E 'product|vendor|size' | awk '{$1=$1;print}' | grep -v 'ansiversion\|mount.fstype\|guid')"
 videoCard="$(lshw -C display | grep vendor | cut -d ":" -f2 && lshw -C display | grep product | cut -d ":" -f2 )"
 fqdnInfo="$(sudo hostname -f)"
 hostAddress="$(hostname -I)"
+#This line will print only the default gateway address, the cut's commands will filter out all other unrelevant information 
 gatewayAddress="$(ip route | grep 'default' |  cut -d " " -f3- | cut -d " " -f1)"
 dnsAddress="$(grep -i nameserver /etc/resolv.conf |head -1| awk '{print $2}')"
 interfaceName="$(hwinfo --network --short | cut -d " " -f3-)"
 ipAddresses="$(ip r)"
+#This line will only show the username of those that are logged in, the cut command filters out the unessacary information
 loggedUser="$(who -u | cut -d " " -f1)"
 spaceDiskMounted="$(df -h)"
 countProcess="$(ps)"
