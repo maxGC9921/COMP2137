@@ -12,22 +12,22 @@ cpuSpeed="$(grep 'cpu MHz' /proc/cpuinfo | cut -d ":" -f2 | uniq && sudo dmideco
 #This line will only display the Memory size. Cut is used to remove 'Memory Size' from the output
 ramInfo="$(hwinfo --memory | grep 'Memory Size' | cut -d ":" -f2)"
 #This line will output the product, vendor, and size while also removing unnecessary white space. grep -v is being used to filter unnecessary information from the output
-diskInfo="$(sudo lshw -class disk | grep -E 'product|vendor|size' | awk '{$1=$1;print}' | grep -v 'ansiversion\|mount.fstype\|guid')"
+diskInfo="$(sudo lshw -class disk | grep -E 'product|vendor|size' | awk '{$1=$1;print}' | grep -v 'ansiversion\|mount.fstype\|guid')" #CLEAN THIS UP TO INCLUDE ONLY DEV/MAIN DRIVES
 videoCard="$(lshw -C display | grep vendor | cut -d ":" -f2 && lshw -C display | grep product | cut -d ":" -f2 )"
 fqdnInfo="$(sudo hostname -f)"
 hostAddress="$(hostname -I)"
 #This line will print only the default gateway address, the cut's commands will filter out all other unrelevant information 
 gatewayAddress="$(ip route | grep 'default' |  cut -d " " -f3- | cut -d " " -f1)"
 dnsAddress="$(grep -i nameserver /etc/resolv.conf |head -1| awk '{print $2}')"
-interfaceName="$(hwinfo --network --short | cut -d " " -f3-)"
+interfaceName="$(hwinfo --network --short | cut -d " " -f3-)" #CLEAN THIS UP TO ONLY INCLUDE THE ADDRESSES
 ipAddresses="$(ip r)"
 #This line will only show the username of those that are logged in, the cut command filters out the unessacary information
 loggedUser="$(who -u | cut -d " " -f1)"
 spaceDiskMounted="$(df -h)"
-countProcess="$(ps)"
+countProcess="$(ps)" #THIS IS WRONG !!
 averageLoad="$(cat /proc/loadavg)"
 allocatedMemory="$(free -h)"
-listenNetwork="$(sudo ss -tunlp)"
+listenNetwork="$(sudo ss -tunlp)" #CLEAN THIS UP TO ONLY INCLUDE RELEVANT INFORMATION!!!
 rulesUfw="$(sudo ufw status)"
 cat <<EOF
 
