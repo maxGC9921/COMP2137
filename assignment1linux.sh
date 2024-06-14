@@ -19,12 +19,14 @@ hostAddress="$(hostname -I)"
 #This line will print only the default gateway address, the cut's commands will filter out all other unrelevant information 
 gatewayAddress="$(ip route | grep 'default' |  cut -d " " -f3- | cut -d " " -f1)"
 dnsAddress="$(grep -i nameserver /etc/resolv.conf |head -1| awk '{print $2}')"
-interfaceName="$(hwinfo --network --short | cut -d " " -f3-)" #CLEAN THIS UP TO ONLY INCLUDE THE ADDRESSES
+#This line will only print the name of the interfaces. It will also ensure that the loopback address won't be included in the output
+interfaceName="$(hwinfo --network --short | cut -d " " -f3 | grep -v 'lo')"
 ipAddresses="$(ip r)"
 #This line will only show the username of those that are logged in, the cut command filters out the unessacary information
 loggedUser="$(who -u | cut -d " " -f1)"
 spaceDiskMounted="$(df -h)"
-countProcess="$(ps)" #THIS IS WRONG !!
+#This line will count how many procceses are running
+countProcess="$(ps -e | wc -l)"
 averageLoad="$(cat /proc/loadavg)"
 allocatedMemory="$(free -h)"
 listenNetwork="$(sudo ss -tunlp)" #CLEAN THIS UP TO ONLY INCLUDE RELEVANT INFORMATION!!!
