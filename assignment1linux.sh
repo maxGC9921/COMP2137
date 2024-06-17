@@ -4,6 +4,7 @@ dateTime="$(date)"
 hostnameReport="$(hostname)" 
 #This line will print only the name of the Operating System with the version
 operatingSystem="$(grep 'PRETTY_NAME' /etc/os-release | cut -d'"' -f2)"
+#This line will display how long the system has been up
 timeUp="$(uptime -p)"
 #This line will print info on the CPU, the delimiter will remove the "Model name" from the output while awk while be used to bring closer the output to "cpu:"
 cpuInfo="$(lscpu | grep 'Model name: ' | cut -d " " -f3- | awk '{$1=$1;print}')"
@@ -12,25 +13,34 @@ cpuSpeed="$(grep 'cpu MHz' /proc/cpuinfo | cut -d ":" -f2 | uniq && sudo dmideco
 #This line will only display the Memory size. Cut is used to remove 'Memory Size' from the output
 ramInfo="$(hwinfo --memory | grep 'Memory Size' | cut -d ":" -f2)"
 #This line will output the product, vendor, and size while also removing unnecessary white space. grep -v is being used to filter unnecessary information from the output
-diskInfo="$(sudo lshw -class disk | grep -E 'product|vendor|size' | awk '{$1=$1;print}' | grep -v 'ansiversion\|mount.fstype\|guid')" 
+diskInfo="$(sudo lshw -class disk | grep -E 'product|vendor|size' | awk '{$1=$1;print}' | grep -v 'ansiversion\|mount.fstype\|guid')"
+#This line will output only the vendor and product of the graphic card. The cut command is used to display the relevant information in an easily readable format
 videoCard="$(lshw -C display | grep vendor | cut -d ":" -f2 && lshw -C display | grep product | cut -d ":" -f2 )"
+#Ths line will output the Fully Qualified Domain Name
 fqdnInfo="$(sudo hostname -f)"
+#This line will output the host ip address
 hostAddress="$(hostname -i)"
 #This line will print only the default gateway address, the cut's commands will filter out all other unrelevant information 
 gatewayAddress="$(ip route | grep 'default' |  cut -d " " -f3- | cut -d " " -f1)"
+#This line will only print the dns address. The head and awk commands are used to only present relevant information in a easily readable format
 dnsAddress="$(grep -i nameserver /etc/resolv.conf |head -1| awk '{print $2}')"
 #This line will only print the name of the interfaces. It will also ensure that the loopback address won't be included in the output
 interfaceName="$(hwinfo --network --short | cut -d " " -f3 | grep -v 'lo')"
+#This line will display display all the ip addresses that corresponds with 'inet'. The awk and cut commands are being used to present the relevant information in an easily readable format
 ipAddresses="$(ifconfig | grep 'inet' | awk '{$1=$1;print}' | cut -d " " -f2-)"
 #This line will only show the username of those that are logged in, the cut command filters out the unessacary information
 loggedUser="$(who -u | cut -d " " -f1)"
+#This line will output the drives that are mounted in human readable form
 spaceDiskMounted="$(df -h | grep 'dev')"
 #This line will count how many procceses are running
 countProcess="$(ps -e | wc -l)"
+#This line will output the average load
 averageLoad="$(cat /proc/loadavg)"
+#This line will ouput the memory allocation in a human readable form
 allocatedMemory="$(free -h)"
 #This line will only show the networks that are in 'LISTEN' mode
 listenNetwork="$(sudo ss -tunl | grep 'LISTEN')" 
+#This line will show wheter the ufw is active/inactive
 rulesUfw="$(sudo ufw status)"
 cat <<EOF
 
