@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat /etc/hosts
-
+echo " "
 
 apache2=$(dpkg-query -l | grep apache2)
 
