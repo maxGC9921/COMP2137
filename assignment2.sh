@@ -1,5 +1,7 @@
 #!/bin/bash
 
+################################################################
+
 cat /etc/hosts
 echo " "
 
@@ -14,7 +16,7 @@ else
     echo "The address 192.168.16.200 has already been replaced"
 fi
 
-
+################################################################
 
 #This command will verify if apache2 is already installed
 dpkg-query -l | grep apache2
@@ -33,9 +35,14 @@ else
 	sudo apt install squid -y
 fi
 
+################################################################
 
-
+sudo ufw enable
 sudo ufw allow proto tcp from 172.16.1.200 to any port 22
+sudo ufw allow 80/tcp
+
+################################################################
+
 #The following commands will add dennis while also adding him to the sudo group. He will also received ssh keys for rsa and ed25519 algorithms
 adduser dennis
 usermod -aG sudo dennis
