@@ -58,4 +58,6 @@ for user in "${users[@]}"
 do
     adduser $user
     ssh-keygen -t ed25519
+    cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
+
 done
