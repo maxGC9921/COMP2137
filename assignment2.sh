@@ -7,10 +7,10 @@ echo " "
 ip addr show eth0 | grep -q '192.168.16.200/24'
 
 if [ $? -eq 0 ]; then
-     sudo sed -i 's/192.168.16.200/192.168.16.22/' /etc/netplan/10-lxc.yaml
+     sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/netplan/10-lxc.yaml
      sudo netplan apply
 else
-    echo "Something went wrong"
+    echo "The address 192.168.16.200 has already been replaced"
 fi
 
 
@@ -29,5 +29,5 @@ dpkg-query -l | grep squid
 if [ $? -eq 0 ]; then
 	echo "Squid is already installed"
 else
-	sudo apt install sqid
+	sudo apt install squid -y
 fi
