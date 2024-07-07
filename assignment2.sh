@@ -20,12 +20,14 @@ fi
 
 #This command will verify if apache2 is already installed
 dpkg-query -l | grep apache2
+
 #If the last command is succesful than the user will be notified that apache2 is already installed. Else, it will be installed for the user
 if [ $? -eq 0 ]; then
 	echo "Apache 2 is already installed"
 else
 	sudo apt install apache2
 fi
+
 #This command will verify if squid is already installed
 dpkg-query -l | grep squid
 #If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user
@@ -37,6 +39,7 @@ fi
 
 ################################################################
 
+#The following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces
 sudo ufw enable
 sudo ufw allow proto tcp from 172.16.1.200 to any port 22
 sudo ufw allow 80/tcp
