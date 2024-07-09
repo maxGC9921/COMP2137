@@ -11,7 +11,9 @@ ip addr show eth0 | grep -q '192.168.16.200/24'
 if [ $? -eq 0 ]; then
      sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/netplan/10-lxc.yaml
      sudo netplan apply
-     sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/hosts
+     sudo sed -i 's/^192.168.16.200\s\+server1/192.168.16.21\tserver1/g' /etc/hosts
+
+
 else
     echo "The address 192.168.16.200 has already been replaced"
 fi
