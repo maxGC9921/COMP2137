@@ -12,8 +12,6 @@ if [ $? -eq 0 ]; then
      sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/netplan/10-lxc.yaml
      sudo netplan apply
      sudo sed -i 's/^192.168.16.200\s\+server1/192.168.16.21\tserver1/g' /etc/hosts
-
-
 else
     echo "The address 192.168.16.200 has already been replaced"
 fi
@@ -43,6 +41,16 @@ fi
 
 #The following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces
 
+which ufw
+
+if [ $? -eq 1 ]; then
+	echo "UFW will be installed"
+	sudo apt install ufw
+else
+	echo "There is a problem with the UFW configuration"
+fi
+
+
 sudo ufw enable
 sudo ufw allow proto tcp from 172.16.1.200 to any port 22
 sudo ufw allow 80/tcp
@@ -63,5 +71,6 @@ do
     adduser $user
     ssh-keygen -t ed25519
     cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
+    echo " "
 
 done
