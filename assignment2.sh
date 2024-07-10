@@ -11,11 +11,16 @@ echo " "
 ip addr show eth0 | grep -q '192.168.16.200/24'
 #If the last command was successful, then sed -i is used to replace the old ip address with the new one that is located in /etc/netplan/10-lxc.yaml and netplan apply will apply the configuration.
 if [ $? -eq 0 ]; then
-     sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/netplan/10-lxc.yaml
-     sudo netplan apply
-     sudo sed -i 's/^192.168.16.200\s\+server1/192.168.16.21\tserver1/g' /etc/hosts
+	echo "################################################################"
+	echo "The old address 192.168.16.200 will be replace with 192.168.16.21 on server1"
+	echo "################################################################"
+	sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/netplan/10-lxc.yaml
+	sudo netplan apply
+	sudo sed -i 's/^192.168.16.200\s\+server1/192.168.16.21\tserver1/g' /etc/hosts
 else
-    echo "The address 192.168.16.200 has already been replaced"
+	echo "################################################################"
+	echo "The address 192.168.16.200 doesn't exist"
+	echo "################################################################"
 fi
 
 ################################################################
@@ -27,7 +32,9 @@ dpkg-query -l | grep apache2
 
 #If the last command is succesful than the user will be notified that apache2 is already installed. Else, it will be installed for the user
 if [ $? -eq 0 ]; then
+	echo "################################################################"
 	echo "Apache 2 is already installed"
+	echo "################################################################"
 else
 	echo "################################################################"
 	echo "Apache 2 will be installed"
@@ -39,7 +46,9 @@ fi
 dpkg-query -l | grep squid
 #If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user
 if [ $? -eq 0 ]; then
+	echo "################################################################"
 	echo "Squid is already installed"
+	echo "################################################################"
 else
 	echo "################################################################"
 	echo "Squid will be installed"
@@ -61,19 +70,22 @@ if [ $? -eq 1 ]; then
 	echo "################################################################"
 	sudo apt install ufw -y
 else
-	echo "There is a problem with the UFW configuration"
-	
+	echo "################################################################"
+	echo "UFW is either already installed or there was a problem in it's configuration"
+	echo "################################################################"
 fi
 
 which ufw
 
 if [ $? -eq 0 ]; then
-	sudo ufw enable
+	sudo ufw enable -y
 	sudo ufw allow proto tcp from 172.16.1.200 to any port 22
 	sudo ufw allow 80/tcp
 	sudo ufw allow 3128
 else
+	echo "################################################################"
 	echo "Something went wrong when applying the rules"
+	echo "################################################################"
 fi
 
 ################################################################
