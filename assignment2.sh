@@ -7,6 +7,8 @@
 #This command will quietly checked if the ip address for eth0 is 192.168.16.200/24
 ip addr show eth0 | grep -q '192.168.16.200/24'
 #If the last command was successful, then sed -i is used to replace the old ip address with the new one that is located in /etc/netplan/10-lxc.yaml and netplan apply will apply the configuration.
+#sed -i will also replace the old address where server1 is located with new addresss
+#Else the user will be notified that the address 192.168.16.200 does not exist anymore
 if [ $? -eq 0 ]; then
 	echo "################################################################"
 	echo "The old address 192.168.16.200 will be replace with 192.168.16.21 on server1"
@@ -27,7 +29,7 @@ fi
 #This command will verify if apache2 is already installed
 dpkg-query -l | grep apache2
 
-#If the last command is succesful than the user will be notified that apache2 is already installed. Else, it will be installed for the user
+#If the last command is succesful than the user will be notified that apache2 is already installed. Else, it will be installed for the user. Yes is inputed for the user to automate the install
 if [ $? -eq 0 ]; then
 	echo "################################################################"
 	echo "Apache 2 is already installed"
@@ -41,7 +43,7 @@ fi
 
 #This command will verify if squid is already installed
 dpkg-query -l | grep squid
-#If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user
+#If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user. Yes is inputed for the user to automate the install
 if [ $? -eq 0 ]; then
 	echo "################################################################"
 	echo "Squid is already installed"
@@ -57,7 +59,7 @@ fi
 ########################## UFW #################################
 ################################################################
 
-#The following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces
+#Which ufw is used to verify if ufw is already installed. If the last line was not successful, ufw will be installed. Else the user will be notified if it's already installed or there was an error
 
 which ufw
 
@@ -73,6 +75,9 @@ else
 fi
 
 which ufw
+
+#The following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces and finally allow web proxy on both interfaces.
+#Else the user will notified of an error when applying the rules
 
 if [ $? -eq 0 ]; then
 	echo "y" | sudo ufw enable
