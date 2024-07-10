@@ -29,7 +29,10 @@ dpkg-query -l | grep apache2
 if [ $? -eq 0 ]; then
 	echo "Apache 2 is already installed"
 else
-	sudo apt install apache2
+	echo "################################################################"
+	echo "Apache 2 will be installed"
+	echo "################################################################"
+	sudo apt install apache2 -y
 fi
 
 #This command will verify if squid is already installed
@@ -38,6 +41,9 @@ dpkg-query -l | grep squid
 if [ $? -eq 0 ]; then
 	echo "Squid is already installed"
 else
+	echo "################################################################"
+	echo "Squid will be installed"
+	echo "################################################################"
 	sudo apt install squid -y
 fi
 
@@ -50,17 +56,25 @@ fi
 which ufw
 
 if [ $? -eq 1 ]; then
+	echo "################################################################"
 	echo "UFW will be installed"
-	sudo apt install ufw
+	echo "################################################################"
+	sudo apt install ufw -y
 else
 	echo "There is a problem with the UFW configuration"
+	
 fi
 
+which ufw
 
-sudo ufw enable
-sudo ufw allow proto tcp from 172.16.1.200 to any port 22
-sudo ufw allow 80/tcp
-sudo ufw allow 3128
+if [ $? -eq 0 ]; then
+	sudo ufw enable
+	sudo ufw allow proto tcp from 172.16.1.200 to any port 22
+	sudo ufw allow 80/tcp
+	sudo ufw allow 3128
+else
+	echo "Something went wrong when applying the rules"
+fi
 
 ################################################################
 ###################### USERS ###################################
@@ -79,6 +93,6 @@ do
     adduser $user
     ssh-keygen -t ed25519
     cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
-    echo " "
+    echo "################################################################"
 
 done
