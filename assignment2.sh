@@ -4,9 +4,6 @@
 #################### IP CONFIGURATION ##########################
 ################################################################
 
-cat /etc/hosts
-echo " "
-
 #This command will quietly checked if the ip address for eth0 is 192.168.16.200/24
 ip addr show eth0 | grep -q '192.168.16.200/24'
 #If the last command was successful, then sed -i is used to replace the old ip address with the new one that is located in /etc/netplan/10-lxc.yaml and netplan apply will apply the configuration.
@@ -78,7 +75,7 @@ fi
 which ufw
 
 if [ $? -eq 0 ]; then
-	sudo ufw enable -y
+	echo "y" | sudo ufw enable
 	sudo ufw allow proto tcp from 172.16.1.200 to any port 22
 	sudo ufw allow 80/tcp
 	sudo ufw allow 3128
@@ -93,16 +90,17 @@ fi
 ################################################################
 
 #The following commands will add dennis while also adding him to the sudo group. He will also received ssh keys for rsa and ed25519 algorithms
+echo "########################### Adding Dennis #####################################"
 adduser dennis
 usermod -aG sudo dennis
 ssh-keygen -t ed25519
-
+echo "################################################################"
 #All the other users have been assigned to the variable users
 users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 #A For loop is used to automate the adduser process for all of the users while also giving them ssh keys for rsa and ed25519 algorithms
 for user in "${users[@]}"
 do
- 	echo "################################################################"   
+ 	echo "####################### Adding $user #########################################"   
 	adduser $user
 	ssh-keygen -t ed25519
 	cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
