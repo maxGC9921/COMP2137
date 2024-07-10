@@ -90,9 +90,10 @@ users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cind
 #A For loop is used to automate the adduser process for all of the users while also giving them ssh keys for rsa and ed25519 algorithms
 for user in "${users[@]}"
 do
-    adduser $user
-    ssh-keygen -t ed25519
-    cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
-    echo "################################################################"
+ 	echo "################################################################"   
+	adduser $user
+	ssh-keygen -t ed25519
+	cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
+	echo "################################################################"
 
 done
