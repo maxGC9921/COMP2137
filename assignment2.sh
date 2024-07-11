@@ -9,6 +9,7 @@ ip addr show eth0 | grep -q '192.168.16.200/24'
 #If the last command was successful, then sed -i is used to replace the old ip address with the new one that is located in /etc/netplan/10-lxc.yaml and netplan apply will apply the configuration.
 #sed -i will also replace the old address where server1 is located with new addresss
 #Else the user will be notified that the address 192.168.16.200 does not exist anymore
+
 if [ $? -eq 0 ]; then
 	echo "################################################################"
 	echo "The old address 192.168.16.200 will be replace with 192.168.16.21 on server1"
@@ -23,8 +24,6 @@ else
 fi
 
 #Could be better checked 
-
-#cat /etc/hosts | grep "192" | cut -d " " -f3
 
 ################################################################
 #################### APACHE2 AND SQUID #########################
@@ -101,10 +100,14 @@ fi
 
 #The following commands will add dennis while also adding him to the sudo group. He will also received ssh keys for rsa and ed25519 algorithms
 echo "########################### Adding Dennis #####################################"
-adduser dennis
+useradd dennis
 usermod -aG sudo dennis
-ssh-keygen -t ed25519
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> ~dennis/.ssh/authorized_keys
+mkdir -p /home/dennis/.ssh
+ssh-keygen -t ed25519 -f /home/dennis/.ssh/id_ed25519 -N "" 
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys
+chmod 700 /home/dennis/.ssh
+chmod 600 /home/dennis/.ssh/authorized_keys
+
 echo "################################################################"
 #All the other users have been assigned to the variable users
 users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
@@ -112,10 +115,9 @@ users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cind
 for user in "${users[@]}"
 do
  	echo "####################### Adding $user #########################################"   
- 	#useradd
 	useradd $user
-	ssh-keygen -t ed25519
-	cat ~/id_ed25519.pub >> ~/.ssh/authorized_keys
+	ssh-keygen -t ed25519 
+	cat /home/$user/id_ed25519.pub >> /home/$user/.ssh/authorized_keys
 	echo "################################################################"
 
 done
