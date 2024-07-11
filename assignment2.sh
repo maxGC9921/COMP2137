@@ -22,6 +22,10 @@ else
 	echo "################################################################"
 fi
 
+#Could be better checked 
+
+#cat /etc/hosts | grep "192" | cut -d " " -f3
+
 ################################################################
 #################### APACHE2 AND SQUID #########################
 ################################################################
@@ -61,20 +65,21 @@ fi
 
 #Which ufw is used to verify if ufw is already installed. If the last line was not successful, ufw will be installed. Else the user will be notified if it's already installed or there was an error
 
-which ufw
+which ufw >/dev/null
 
 if [ $? -eq 1 ]; then
 	echo "################################################################"
 	echo "UFW will be installed"
 	echo "################################################################"
 	sudo apt install ufw -y
+	#check that the install worked
 else
 	echo "################################################################"
 	echo "UFW is either already installed or there was a problem in it's configuration"
 	echo "################################################################"
 fi
 
-which ufw
+which ufw >/dev/null
 
 #The following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces and finally allow web proxy on both interfaces.
 #Else the user will notified of an error when applying the rules
@@ -99,6 +104,7 @@ echo "########################### Adding Dennis ################################
 adduser dennis
 usermod -aG sudo dennis
 ssh-keygen -t ed25519
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> ~dennis/.ssh/authorized_keys
 echo "################################################################"
 #All the other users have been assigned to the variable users
 users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
@@ -106,9 +112,10 @@ users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cind
 for user in "${users[@]}"
 do
  	echo "####################### Adding $user #########################################"   
-	adduser $user
+ 	#useradd
+	useradd $user
 	ssh-keygen -t ed25519
-	cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
+	cat ~/id_ed25519.pub >> ~/.ssh/authorized_keys
 	echo "################################################################"
 
 done
