@@ -24,7 +24,7 @@ else
 	echo "################################################################"
 fi
 
-#Could be better checked 
+
 
 ################################################################
 #################### APACHE2 AND SQUID #########################
@@ -33,16 +33,22 @@ fi
 #This command will verify if apache2 is already installed
 dpkg-query -l | grep apache2
 
-#If the last command is succesful than the user will be notified that apache2 is already installed. Else, it will be installed for the user. Yes is inputed for the user to automate the install
+
+#If the last command is succesful than the user will be notified that apache2 is already installed.
+# Else, an update will take place before the packages are installed. Following the update, apache2 is installed.
+
 if [ $? -eq 0 ]; then
 	echo "################################################################"
 	echo "Apache 2 is already installed"
 	echo "################################################################"
 else
 	echo "################################################################"
-	echo "An update is taking place. Apache 2 will be installed following the conclusion of the update"
+	echo "An update is taking place before installation of the packages"
 	echo "################################################################"
 	sudo apt update -y >/dev/null 2>&1
+	echo "################################################################"
+	echo "Apache2 is being installed"
+	echo "################################################################"
 	sudo apt install apache2 -y >/dev/null 2>&1
 fi
 
@@ -64,7 +70,9 @@ fi
 ########################## UFW #################################
 ################################################################
 
-#Which ufw is used to verify if ufw is already installed. If the last line was not successful, ufw will be installed. Else the user will be notified if it's already installed or there was an error
+#Which ufw is used to verify if ufw is already installed. 
+#If the last line was not successful, ufw will be installed and then a verifcation will occur to ensure the installation was a success.
+#Else the user will be notified if it's already installed.
 
 which ufw >/dev/null 2>&1
 
@@ -73,10 +81,15 @@ if [ $? -eq 1 ]; then
 	echo "UFW will be installed"
 	echo "################################################################"
 	sudo apt install ufw -y >/dev/null 2>&1
-	#check that the install worked
+	if [ $? -eq 0 ]; then
+		echo "UFW installation was a success !"
+	else
+		echo "A problem has occured during the installation of UFW"
+		exit 1 
+	fi	
 else
 	echo "################################################################"
-	echo "UFW is either already installed or there was a problem in it's configuration"
+	echo "UFW is already installed"
 	echo "################################################################"
 fi
 
@@ -90,9 +103,12 @@ if [ $? -eq 0 ]; then
 	sudo ufw allow proto tcp from 172.16.1.200 to any port 22 >/dev/null
 	sudo ufw allow 80/tcp >/dev/null
 	sudo ufw allow 3128 >/dev/null
+	echo "################################################################"
+	echo "Rules for UFW are being applied"
+	echo "################################################################"
 else
 	echo "################################################################"
-	echo "Something went wrong when applying the rules"
+	echo "An error regarding the UFW rules occured"
 	echo "################################################################"
 fi
 
@@ -108,23 +124,23 @@ if ! id -u dennis >/dev/null 2>&1; then
 else
 	echo "User $user already exists"
 fi
+
 usermod -aG sudo dennis >/dev/null
 mkdir -p /home/dennis/.ssh >/dev/null
 chmod 700 /home/dennis/.ssh >/dev/null
+
 if [ ! -f "/home/dennis/.ssh/id_ed25519" ]; then
 	ssh-keygen -t ed25519 -f /home/dennis/.ssh/id_ed25519 -N "" >/dev/null
 fi
 
 if [ ! -f "/home/dennis/.ssh/authorized_keys" ]; then
-    sudo touch /home/dennis/.ssh/authorized_keys >/dev/null
-    sudo chmod 600 /home/dennis/.ssh/authorized_keys >/dev/null
- 
+	sudo touch /home/dennis/.ssh/authorized_keys >/dev/null
+	sudo chmod 600 /home/dennis/.ssh/authorized_keys >/dev/null
 fi
 
 
 if ! grep -q "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" /home/dennis/.ssh/authorized_keys; then
-	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys
-	
+	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys	
 fi
 echo "################################################################"
 #All the other users have been assigned to the variable users
