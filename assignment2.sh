@@ -40,8 +40,9 @@ if [ $? -eq 0 ]; then
 	echo "################################################################"
 else
 	echo "################################################################"
-	echo "Apache 2 will be installed"
+	echo "An update is taking place. Apache 2 will be installed following the conclusion of the update"
 	echo "################################################################"
+	sudo apt update -y >/dev/null 2>&1
 	sudo apt install apache2 -y >/dev/null 2>&1
 fi
 
@@ -109,14 +110,21 @@ else
 fi
 usermod -aG sudo dennis >/dev/null
 mkdir -p /home/dennis/.ssh >/dev/null
+chmod 700 /home/dennis/.ssh >/dev/null
 if [ ! -f "/home/dennis/.ssh/id_ed25519" ]; then
 	ssh-keygen -t ed25519 -f /home/dennis/.ssh/id_ed25519 -N "" >/dev/null
 fi
 
+if [ ! -f "/home/dennis/.ssh/authorized_keys" ]; then
+    sudo touch /home/dennis/.ssh/authorized_keys >/dev/null
+    sudo chmod 600 /home/dennis/.ssh/authorized_keys >/dev/null
+ 
+fi
+
+
 if ! grep -q "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" /home/dennis/.ssh/authorized_keys; then
 	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys
-	chmod 700 /home/dennis/.ssh >/dev/null
-	chmod 600 /home/dennis/.ssh/authorized_keys >/dev/null
+	
 fi
 echo "################################################################"
 #All the other users have been assigned to the variable users
