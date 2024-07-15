@@ -129,11 +129,11 @@ mkdir -p /home/dennis/.ssh >/dev/null
 chown -R dennis:dennis /home/dennis/.ssh >/dev/null
 chmod 700 /home/dennis/.ssh >/dev/null
 
-#The following if statement will test if Dennis already has his keys, if he doesn't then he will will received them.
+#The following if statement will test if Dennis already has an ed25519 algorithm key, if he doesn't then he will receive it.
 if [ ! -f "/home/dennis/.ssh/id_ed25519" ]; then
 	ssh-keygen -t ed25519 -f /home/dennis/.ssh/id_ed25519 -N "" >/dev/null
 fi
-
+#The following if statement will test if Dennis already has an RSA algorithm key, if he doesn't then he will receive it.
 if [ ! -f "/home/dennis/.ssh/id_rsa" ]; then
 	sudo -u dennis ssh-keygen -t rsa -b 4096 -N "" -f "/home/dennis/.ssh/id_rsa" -C "dennis@$(hostname)" >/dev/null
 fi
@@ -161,20 +161,20 @@ do
 	else
 	        echo "User $user already exists"
         fi
-        #
+        ##The following if statement will test if the user already has an ed25519 algorithm key, if he doesn't then he will receive it.
     	if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
 		sudo -u $user ssh-keygen -t ed25519 -N "" -f "/home/$user/.ssh/id_ed25519" -C "$user@$(hostname)" >/dev/null
         fi
-        #
+        ##The following if statement will test if the user already has an RSA algorithm key, if he doesn't then he will receive it.
     	if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
 		sudo -u $user ssh-keygen -t rsa -b 4096 -N "" -f "/home/$user/.ssh/id_rsa" -C "$user@$(hostname)" >/dev/null
         fi
-        #
+        #The following lines will create the directory 
     	sudo mkdir -p /home/$user/.ssh >/dev/null 2>&1
     	sudo chmod 700 /home/$user/.ssh >/dev/null
     	sudo chown $user:$user /home/$user/.ssh >/dev/null
-    	cat /home/$user/.ssh/id_ed25519.pub | sudo tee -a /home/$user/.ssh/authorized_keys >/dev/null
-    	cat /home/$user/.ssh/id_rsa.pub | sudo tee -a /home/$user/.ssh/authorized_keys >/dev/null
+    	cat /home/$user/.ssh/id_ed25519.pub >> /home/$user/.ssh/authorized_keys >/dev/null
+    	cat /home/$user/.ssh/id_rsa.pub >> /home/$user/.ssh/authorized_keys >/dev/null
     	sudo chmod 600 /home/$user/.ssh/authorized_keys >/dev/null
     	sudo chown $user:$user /home/$user/.ssh/authorized_keys >/dev/null
     	echo "###############################################################"
