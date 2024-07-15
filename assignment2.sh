@@ -93,11 +93,11 @@ else
 	echo "################################################################"
 fi
 
+#Which ufw is used to verify if ufw is already installed. 
 which ufw >/dev/null 2>&1
-
-#The following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces and finally allow web proxy on both interfaces.
+#If the last line was successfull
+#then the following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces and finally allow web proxy on both interfaces.
 #Else the user will notified of an error when applying the rules
-
 if [ $? -eq 0 ]; then
 	echo "y" | sudo ufw enable >/dev/null 2>&1
 	sudo ufw allow proto tcp from 172.16.1.200 to any port 22 >/dev/null
@@ -116,51 +116,60 @@ fi
 ###################### USERS ###################################
 ################################################################
 
-#The following commands will add dennis while also adding him to the sudo group. He will also received ssh keys for rsa and ed25519 algorithms
-
+#The following commands will verify if Dennis already exists than useradd him if he does not. The line also makes bash the default shell
 echo "########################### Adding Dennis #####################################"
 if ! id -u dennis >/dev/null 2>&1; then
-	sudo useradd dennis >/dev/null
+	sudo useradd -m -d /home/dennis -s /bin/bash dennis >/dev/null
 else
-	echo "User $user already exists"
+	echo "User Dennis already exists"
 fi
-
+#His account will be given sudo privileges along by creating the directory .ssh and make him the only one that has access to it
 usermod -aG sudo dennis >/dev/null
 mkdir -p /home/dennis/.ssh >/dev/null
+chown -R dennis:dennis /home/dennis/.ssh >/dev/null
 chmod 700 /home/dennis/.ssh >/dev/null
 
+#The following if statement will test if Dennis already has his keys, if he doesn't then he will will received them.
 if [ ! -f "/home/dennis/.ssh/id_ed25519" ]; then
 	ssh-keygen -t ed25519 -f /home/dennis/.ssh/id_ed25519 -N "" >/dev/null
 fi
 
+if [ ! -f "/home/dennis/.ssh/id_rsa" ]; then
+	sudo -u dennis ssh-keygen -t rsa -b 4096 -N "" -f "/home/dennis/.ssh/id_rsa" -C "dennis@$(hostname)" >/dev/null
+fi
+#The following if statement will test if Dennis already has an authorized_keys file. If he doesn't, it will be created and given the proper permissions.
 if [ ! -f "/home/dennis/.ssh/authorized_keys" ]; then
 	sudo touch /home/dennis/.ssh/authorized_keys >/dev/null
 	sudo chmod 600 /home/dennis/.ssh/authorized_keys >/dev/null
+	sudo chown dennis:dennis /home/dennis/.ssh/authorized_keys >/dev/null
 fi
 
-
+#The following if statement will verify if the provided key is already present in authorized_keys file. If not, it will be appended.
 if ! grep -q "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" /home/dennis/.ssh/authorized_keys; then
 	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys	
 fi
 echo "################################################################"
 #All the other users have been assigned to the variable users
-#A For loop is used to automate the useradd process for all of the users while also giving them ssh keys for rsa and ed25519 algorithms
-#Within the loop, verifications are in place to ensure that the user and their keys don't already exist. Directories are created, made executable, ownerships are changed
 users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
+#A For loop is used to automate the useradd process for all of the users while also giving them ssh keys for rsa and ed25519 algorithms
 for user in "${users[@]}"
 do
 	echo "####################### Adding $user #########################################"
+	#The following commands will verify if the user already exists than useradd them if they don't. The line also makes bash their default shell
 	if ! id -u $user >/dev/null 2>&1; then
         	sudo useradd -m -d /home/$user -s /bin/bash $user >/dev/null
 	else
 	        echo "User $user already exists"
         fi
+        #
     	if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
 		sudo -u $user ssh-keygen -t ed25519 -N "" -f "/home/$user/.ssh/id_ed25519" -C "$user@$(hostname)" >/dev/null
         fi
+        #
     	if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
 		sudo -u $user ssh-keygen -t rsa -b 4096 -N "" -f "/home/$user/.ssh/id_rsa" -C "$user@$(hostname)" >/dev/null
         fi
+        #
     	sudo mkdir -p /home/$user/.ssh >/dev/null 2>&1
     	sudo chmod 700 /home/$user/.ssh >/dev/null
     	sudo chown $user:$user /home/$user/.ssh >/dev/null
