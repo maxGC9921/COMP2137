@@ -12,16 +12,14 @@ ip addr show eth0 | grep -q '192.168.16.200/24'
 #Else the user will be notified that the address 192.168.16.200 does not exist anymore
 
 if [ $? -eq 0 ]; then
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "The old address 192.168.16.200 will be replace with 192.168.16.21 on server1"
-	echo "################################################################"
 	sudo sed -i 's/192.168.16.200/192.168.16.21/' /etc/netplan/10-lxc.yaml
 	sudo netplan apply
 	sudo sed -i 's/^192.168.16.200\s\+server1/192.168.16.21\tserver1/g' /etc/hosts
 else
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "The address 192.168.16.200 doesn't exist"
-	echo "################################################################"
 fi
 
 
@@ -38,17 +36,14 @@ dpkg-query -l | grep apache2
 # Else, an update will take place before the packages are installed. Following the update, apache2 is installed.
 
 if [ $? -eq 0 ]; then
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "Apache 2 is already installed"
-	echo "################################################################"
 else
-	echo "################################################################"
-	echo "An update is taking place before installation of the packages"
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
+	echo "An update is taking place before the installation of apache2 and squid"
 	sudo apt update -y >/dev/null 2>&1
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "Apache2 is being installed"
-	echo "################################################################"
 	sudo apt install apache2 -y >/dev/null 2>&1
 fi
 
@@ -56,13 +51,11 @@ fi
 dpkg-query -l | grep squid
 #If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user. Yes is inputed for the user to automate the install
 if [ $? -eq 0 ]; then
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "Squid is already installed"
-	echo "################################################################"
 else
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "Squid will be installed"
-	echo "################################################################"
 	sudo apt install squid -y >/dev/null 2>&1
 fi
 
@@ -71,15 +64,14 @@ fi
 ################################################################
 
 #Which ufw is used to verify if ufw is already installed. 
-#If the last line was not successful, ufw will be installed and then a verifcation will occur to ensure the installation was a success.
-#Else the user will be notified if it's already installed.
 
 which ufw >/dev/null 2>&1
-
+#If the last line was not successful, ufw will be installed and then a verifcation will occur to ensure the installation was a success.
+#Else the user will be notified if it's already installed.
 if [ $? -eq 1 ]; then
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "UFW will be installed"
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	sudo apt install ufw -y >/dev/null 2>&1
 	if [ $? -eq 0 ]; then
 		echo "UFW installation was a success !"
@@ -88,9 +80,8 @@ if [ $? -eq 1 ]; then
 		exit 1 
 	fi	
 else
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "UFW is already installed"
-	echo "################################################################"
 fi
 
 #Which ufw is used to verify if ufw is already installed. 
@@ -103,13 +94,12 @@ if [ $? -eq 0 ]; then
 	sudo ufw allow proto tcp from 172.16.1.200 to any port 22 >/dev/null
 	sudo ufw allow 80/tcp >/dev/null
 	sudo ufw allow 3128 >/dev/null
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "Rules for UFW are being applied"
-	echo "################################################################"
 else
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 	echo "An error regarding the UFW rules occured"
-	echo "################################################################"
+	echo "----------------------------------------------------------------"
 fi
 
 ################################################################
@@ -117,7 +107,8 @@ fi
 ################################################################
 
 #The following commands will verify if Dennis already exists than useradd him if he does not. The line also makes bash the default shell
-echo "########################### Adding Dennis #####################################"
+echo "----------------------------------------------------------------"
+echo "Adding Dennis"
 if ! id -u dennis >/dev/null 2>&1; then
 	sudo useradd -m -d /home/dennis -s /bin/bash dennis >/dev/null
 else
@@ -148,13 +139,13 @@ fi
 if ! grep -q "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" /home/dennis/.ssh/authorized_keys; then
 	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys	
 fi
-echo "################################################################"
 #All the other users have been assigned to the variable users
 users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
 #A For loop is used to automate the useradd process for all of the users while also giving them ssh keys for rsa and ed25519 algorithms
 for user in "${users[@]}"
-do
-	echo "####################### Adding $user #########################################"
+do 
+	echo "----------------------------------------------------------------"
+	echo "Adding $user"
 	#The following commands will verify if the user already exists than useradd them if they don't. The line also makes bash their default shell
 	if ! id -u $user >/dev/null 2>&1; then
         	sudo useradd -m -d /home/$user -s /bin/bash $user >/dev/null
@@ -169,7 +160,7 @@ do
     	if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
 		sudo -u $user ssh-keygen -t rsa -b 4096 -N "" -f "/home/$user/.ssh/id_rsa" -C "$user@$(hostname)" >/dev/null
         fi
-        #The following lines will create the directory 
+        #The following lines will create the directory, give proper permissions and ownerships to both .ssh directory and authorized_keys file, append the keys to the authorized_keys file.
     	sudo mkdir -p /home/$user/.ssh >/dev/null 2>&1
     	sudo chmod 700 /home/$user/.ssh >/dev/null
     	sudo chown $user:$user /home/$user/.ssh >/dev/null
@@ -177,6 +168,5 @@ do
     	cat /home/$user/.ssh/id_rsa.pub >> /home/$user/.ssh/authorized_keys >/dev/null
     	sudo chmod 600 /home/$user/.ssh/authorized_keys >/dev/null
     	sudo chown $user:$user /home/$user/.ssh/authorized_keys >/dev/null
-    	echo "###############################################################"
 done
 
