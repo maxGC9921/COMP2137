@@ -103,16 +103,17 @@ else
 fi
 
 ################################################################
-###################### USERS ###################################
+###################### ACCOUNTS ################################
 ################################################################
 
-#The following commands will verify if Dennis already exists than useradd him if he does not. The line also makes bash the default shell
+#The following command will verify if the Dennis account already exists, if not it will create the Dennis account, automatically creates a home directory (`/home/dennis`) for him, sets the default
+#shell to bash.
 echo "----------------------------------------------------------------"
 echo "Adding Dennis"
 if ! id -u dennis >/dev/null 2>&1; then
 	sudo useradd -m -d /home/dennis -s /bin/bash dennis >/dev/null
 else
-	echo "User Dennis already exists"
+	echo "Account Dennis already exists"
 fi
 #His account will be given sudo privileges along by creating the directory .ssh and make him the only one that has access to it
 usermod -aG sudo dennis >/dev/null
@@ -120,11 +121,11 @@ mkdir -p /home/dennis/.ssh >/dev/null
 chown -R dennis:dennis /home/dennis/.ssh >/dev/null
 chmod 700 /home/dennis/.ssh >/dev/null
 
-#The following if statement will test if Dennis already has an ed25519 algorithm key, if he doesn't then he will receive it.
+#This line generates an ed25519 SSH key pair, without a passphrase, and stores it in dennis `.ssh/id_ed25519` directory with a comment containing the username and hostname.
 if [ ! -f "/home/dennis/.ssh/id_ed25519" ]; then
-	ssh-keygen -t ed25519 -f /home/dennis/.ssh/id_ed25519 -N "" >/dev/null
+	sudo -u dennis ssh-keygen -t ed25519 -N "" -f "/home/dennis/.ssh/id_ed25519" -C "dennis@$(hostname)" >/dev/null
 fi
-#The following if statement will test if Dennis already has an RSA algorithm key, if he doesn't then he will receive it.
+#This line generates an RSA SSH key pair, without a passphrase, and stores it in dennis `.ssh/id_rsa` directory with a comment containing the username and hostname.
 if [ ! -f "/home/dennis/.ssh/id_rsa" ]; then
 	sudo -u dennis ssh-keygen -t rsa -b 4096 -N "" -f "/home/dennis/.ssh/id_rsa" -C "dennis@$(hostname)" >/dev/null
 fi
@@ -139,34 +140,35 @@ fi
 if ! grep -q "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" /home/dennis/.ssh/authorized_keys; then
 	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SKzhK4rhGkEVGlCI student@generic-vm" >> /home/dennis/.ssh/authorized_keys	
 fi
-#All the other users have been assigned to the variable users
-users=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
-#A For loop is used to automate the useradd process for all of the users while also giving them ssh keys for rsa and ed25519 algorithms
-for user in "${users[@]}"
+#All the other accounts have been assigned to the variable accounts
+accounts=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
+#A For loop is used to automate the useradd process for all of the accounts while also giving them ssh keys for rsa and ed25519 algorithms
+for account in "${accounts[@]}"
 do 
 	echo "----------------------------------------------------------------"
-	echo "Adding $user"
-	#The following commands will verify if the user already exists than useradd them if they don't. The line also makes bash their default shell
-	if ! id -u $user >/dev/null 2>&1; then
-        	sudo useradd -m -d /home/$user -s /bin/bash $user >/dev/null
+	echo "Adding $account"
+	#This command creates a new account, automatically creates a home directory (`/home/$account`) for the user, sets the default shell to bash.
+	if ! id -u $account >/dev/null 2>&1; then
+        	sudo useradd -m -d /home/$account -s /bin/bash $account >/dev/null
 	else
-	        echo "User $user already exists"
+	        echo "Account $account already exists"
         fi
-        ##The following if statement will test if the user already has an ed25519 algorithm key, if he doesn't then he will receive it.
-    	if [ ! -f "/home/$user/.ssh/id_ed25519" ]; then
-		sudo -u $user ssh-keygen -t ed25519 -N "" -f "/home/$user/.ssh/id_ed25519" -C "$user@$(hostname)" >/dev/null
+        #This line generates an Ed25519 SSH key pair, without a passphrase, and stores it in the user's `.ssh` directory with a comment containing the username and hostname.
+    	if [ ! -f "/home/$account/.ssh/id_ed25519" ]; then
+		sudo -u $account ssh-keygen -t ed25519 -N "" -f "/home/$account/.ssh/id_ed25519" -C "$account@$(hostname)" >/dev/null
         fi
-        ##The following if statement will test if the user already has an RSA algorithm key, if he doesn't then he will receive it.
-    	if [ ! -f "/home/$user/.ssh/id_rsa" ]; then
-		sudo -u $user ssh-keygen -t rsa -b 4096 -N "" -f "/home/$user/.ssh/id_rsa" -C "$user@$(hostname)" >/dev/null
+        #This line generates an RSA SSH key pair, without a passphrase, and stores it in the user's `.ssh` directory with a comment containing the username and hostname.
+    	if [ ! -f "/home/$account/.ssh/id_rsa" ]; then
+		sudo -u $account ssh-keygen -t rsa -b 4096 -N "" -f "/home/$account/.ssh/id_rsa" -C "$account@$(hostname)" >/dev/null
         fi
-        #The following lines will create the directory, give proper permissions and ownerships to both .ssh directory and authorized_keys file, append the keys to the authorized_keys file.
-    	sudo mkdir -p /home/$user/.ssh >/dev/null 2>&1
-    	sudo chmod 700 /home/$user/.ssh >/dev/null
-    	sudo chown $user:$user /home/$user/.ssh >/dev/null
-    	cat /home/$user/.ssh/id_ed25519.pub >> /home/$user/.ssh/authorized_keys >/dev/null
-    	cat /home/$user/.ssh/id_rsa.pub >> /home/$user/.ssh/authorized_keys >/dev/null
-    	sudo chmod 600 /home/$user/.ssh/authorized_keys >/dev/null
-    	sudo chown $user:$user /home/$user/.ssh/authorized_keys >/dev/null
+        #These commands create and configure SSH access, ensuring the .ssh directory is securely set up with appropriate permissions and ownership, and appending both Ed25519 and RSA public keys to 
+        #the authorized_keys file
+    	sudo mkdir -p /home/$account/.ssh >/dev/null 2>&1
+    	sudo chmod 700 /home/$account/.ssh >/dev/null
+    	sudo chown $account:$account /home/$account/.ssh >/dev/null
+    	cat /home/$account/.ssh/id_ed25519.pub >> /home/$account/.ssh/authorized_keys >/dev/null
+    	cat /home/$account/.ssh/id_rsa.pub >> /home/$account/.ssh/authorized_keys >/dev/null
+    	sudo chmod 600 /home/$account/.ssh/authorized_keys >/dev/null
+    	sudo chown $account:$account /home/$account/.ssh/authorized_keys >/dev/null
 done
 
