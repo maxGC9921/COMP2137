@@ -49,7 +49,7 @@ fi
 
 #This command will verify if squid is already installed
 dpkg-query -l | grep squid
-#If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user. Yes is inputed for the user to automate the install
+#If the last command is succesful than the user will be notified that squid is already installed. Else, it will be installed for the user. Yes is inputed to automate the install
 if [ $? -eq 0 ]; then
 	echo "----------------------------------------------------------------"
 	echo "Squid is already installed"
@@ -66,7 +66,7 @@ fi
 #Which ufw is used to verify if ufw is already installed. 
 
 which ufw >/dev/null 2>&1
-#If the last line was not successful, ufw will be installed and then a verifcation will occur to ensure the installation was a success.
+#If the last line was not successful, ufw will be installed and then a verifcation will occur to ensure the installation was a success. 
 #Else the user will be notified if it's already installed.
 if [ $? -eq 1 ]; then
 	echo "----------------------------------------------------------------"
@@ -87,7 +87,7 @@ fi
 #Which ufw is used to verify if ufw is already installed. 
 which ufw >/dev/null 2>&1
 #If the last line was successfull
-#then the following line of codes will allow ufw, enable ssh port 22 only on the mgmt network, allow http on both interfaces and finally allow web proxy on both interfaces.
+#then the following line of codes will enable ufw, allow ssh port 22 only on the mgmt network, allow http on both interfaces and finally allow web proxy on both interfaces.
 #Else the user will notified of an error when applying the rules
 if [ $? -eq 0 ]; then
 	echo "y" | sudo ufw enable >/dev/null 2>&1
@@ -121,15 +121,15 @@ mkdir -p /home/dennis/.ssh >/dev/null
 chown -R dennis:dennis /home/dennis/.ssh >/dev/null
 chmod 700 /home/dennis/.ssh >/dev/null
 
-#This line generates an ed25519 SSH key pair, without a passphrase, and stores it in dennis `.ssh/id_ed25519` directory with a comment containing the username and hostname.
+#This line generates an ed25519 SSH key pair, without a passphrase, and stores it in dennis `.ssh/id_ed25519` file with a comment containing the username and hostname.
 if [ ! -f "/home/dennis/.ssh/id_ed25519" ]; then
 	sudo -u dennis ssh-keygen -t ed25519 -N "" -f "/home/dennis/.ssh/id_ed25519" -C "dennis@$(hostname)" >/dev/null
 fi
-#This line generates an RSA SSH key pair, without a passphrase, and stores it in dennis `.ssh/id_rsa` directory with a comment containing the username and hostname.
+#This line generates an RSA SSH key pair, without a passphrase, and stores it in dennis `.ssh/id_rsa` file with a comment containing the username and hostname.
 if [ ! -f "/home/dennis/.ssh/id_rsa" ]; then
 	sudo -u dennis ssh-keygen -t rsa -b 4096 -N "" -f "/home/dennis/.ssh/id_rsa" -C "dennis@$(hostname)" >/dev/null
 fi
-#The following if statement will test if Dennis already has an authorized_keys file. If he doesn't, it will be created and given the proper permissions.
+#The following lines checks if the file "/home/dennis/.ssh/authorized_keys" exists. If it doesn't, it creates an empty file with restricted permissions and assigns ownership to dennis.
 if [ ! -f "/home/dennis/.ssh/authorized_keys" ]; then
 	sudo touch /home/dennis/.ssh/authorized_keys >/dev/null
 	sudo chmod 600 /home/dennis/.ssh/authorized_keys >/dev/null
@@ -142,7 +142,7 @@ if ! grep -q "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4rT3vTt99Ox5kndS4HmgTrKBT8SK
 fi
 #All the other accounts have been assigned to the variable accounts
 accounts=("aubrey" "captain" "snibbles" "brownie" "scooter" "sandy" "perrier" "cindy" "tiger" "yoda")
-#A For loop is used to automate the useradd process for all of the accounts while also giving them ssh keys for rsa and ed25519 algorithms
+#A For loop is used to automate the useradd process for all of the accounts.
 for account in "${accounts[@]}"
 do 
 	echo "----------------------------------------------------------------"
@@ -153,16 +153,16 @@ do
 	else
 	        echo "Account $account already exists"
         fi
-        #This line generates an Ed25519 SSH key pair, without a passphrase, and stores it in the user's `.ssh` directory with a comment containing the username and hostname.
+        #This line generates an Ed25519 SSH key pair, without a passphrase, and stores it in the user's `.ssh` file with a comment containing the username and hostname.
     	if [ ! -f "/home/$account/.ssh/id_ed25519" ]; then
 		sudo -u $account ssh-keygen -t ed25519 -N "" -f "/home/$account/.ssh/id_ed25519" -C "$account@$(hostname)" >/dev/null
         fi
-        #This line generates an RSA SSH key pair, without a passphrase, and stores it in the user's `.ssh` directory with a comment containing the username and hostname.
+        #This line generates an RSA SSH key pair, without a passphrase, and stores it in the user's `.ssh` file with a comment containing the username and hostname.
     	if [ ! -f "/home/$account/.ssh/id_rsa" ]; then
 		sudo -u $account ssh-keygen -t rsa -b 4096 -N "" -f "/home/$account/.ssh/id_rsa" -C "$account@$(hostname)" >/dev/null
         fi
-        #These commands create and configure SSH access, ensuring the .ssh directory is securely set up with appropriate permissions and ownership, and appending both Ed25519 and RSA public keys to 
-        #the authorized_keys file
+        #The follwing commands will create and configure SSH access, ensuring the .ssh directory is securely set up with appropriate permissions and ownership, and appending both Ed25519 and RSA     
+        #public keys to the authorized_keys file
     	sudo mkdir -p /home/$account/.ssh >/dev/null 2>&1
     	sudo chmod 700 /home/$account/.ssh >/dev/null
     	sudo chown $account:$account /home/$account/.ssh >/dev/null
