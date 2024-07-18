@@ -91,7 +91,7 @@ which ufw >/dev/null 2>&1
 #Else the user will notified of an error when applying the rules
 if [ $? -eq 0 ]; then
 	echo "y" | sudo ufw enable >/dev/null 2>&1
-	sudo ufw allow proto tcp from 172.16.1.200 to any port 22 >/dev/null
+	sudo ufw allow proto tcp from any to 172.16.1.200  >/dev/null
 	sudo ufw allow 80/tcp >/dev/null
 	sudo ufw allow 3128 >/dev/null
 	echo "----------------------------------------------------------------"
