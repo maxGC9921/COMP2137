@@ -1,0 +1,16 @@
+WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running.
+dpkg-preconfigure: unable to re-open stdin: No such file or directory
+Warning: Permanently added 'server1-mgmt' (ED25519) to the list of known hosts.
+WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running.
+Created directory '/home/aubrey/.ssh'.
+Created directory '/home/captain/.ssh'.
+Created directory '/home/snibbles/.ssh'.
+Created directory '/home/brownie/.ssh'.
+Created directory '/home/scooter/.ssh'.
+Created directory '/home/sandy/.ssh'.
+Created directory '/home/perrier/.ssh'.
+Created directory '/home/cindy/.ssh'.
+Created directory '/home/tiger/.ssh'.
+Created directory '/home/yoda/.ssh'.
+WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running.
+WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running.
