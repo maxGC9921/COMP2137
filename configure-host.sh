@@ -23,12 +23,18 @@ updateHostname() {
         echo "$desiredName" > "$HOSTNAME"
         hostname "$desiredName"
         logMessage "Hostname changed from $currentName to $desiredName"
+        
+        # Update /etc/hosts with the new hostname
+        sudo sed -i "s/$currentName/$desiredName/g" "$HOSTS"
+        logMessage "Updated hostname in $HOSTS from $currentName to $desiredName"
     else
         if $VERBOSE; then
             echo "Hostname is already set to $desiredName"
         fi
     fi
 }
+
+
 
 updatedIp() {
     local interface="$1"
