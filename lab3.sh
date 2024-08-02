@@ -16,6 +16,13 @@ errorExit() {
     exit 1
 }
 
+checkHostnameResolution() {
+    local hostname="$1"
+    if ! ping -c 1 "$hostname" &>/dev/null; then
+        errorExit "Hostname resolution failed for $hostname"
+    fi
+}
+
 while [ "$#" -gt 0 ]; do
     case $1 in
         -v)
@@ -34,6 +41,8 @@ transferExecution() {
     local server="$1"
     local arguments="$2"
 
+    checkHostnameResolution "$server"
+
     logMessage "Transferring configure-host.sh to $server"
     scp configure-host.sh remoteadmin@"$server":/root || errorExit "Failed to transfer script to $server"
 
@@ -42,7 +51,6 @@ transferExecution() {
 }
 
 transferExecution "server1-mgmt" "-name loghost -ip 192.168.16.3 -hostentry webhost 192.168.16.4"
-
 transferExecution "server2-mgmt" "-name webhost -ip 192.168.16.4 -hostentry loghost 192.168.16.3"
 
 logMessage "Updating local /etc/hosts file"
